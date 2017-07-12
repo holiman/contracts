@@ -245,7 +245,7 @@ contract BancorFormula is IBancorFormula, SafeMath {
         uint256 res = 0xde1bc4d19efcac82445da75b00000000 * FIXED_ONE;
         uint256 xi = _x;
 
-        /**
+        /*
                 
         The values in this method been generated via the following python snippet: 
 
@@ -260,7 +260,7 @@ contract BancorFormula is IBancorFormula, SafeMath {
                 print("        xi = (xi * _x) / FIXED_ONE; ")
             print("        res += xi * 0x%x; // 34! / %d! " % (o, (a-1)))
 
-        **/
+        */
 
         res += xi * 0xde1bc4d19efcac82445da75b00000000; // 34! / 1! 
         xi = (xi * _x) / FIXED_ONE; 
