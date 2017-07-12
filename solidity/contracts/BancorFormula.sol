@@ -225,90 +225,108 @@ contract BancorFormula is IBancorFormula, SafeMath {
 
         This method is is visible for testcases, but not meant for direct use. 
  
-        The values in this method been generated via the following python snippet: 
+        The actual implementation uses this variant of the formula
 
-        def calculateFactorials():
-            """Method to print out the factorials for fixedExp"""
+        34! * 1 + 
+        34! * x   + 
+        34! / 2! * x^2  + 
+        ..  + 
+        34! / 34! * x^34  + 
 
-            ni = []
-            ni.append( 295232799039604140847618609643520000000) # 34!
-            ITERATIONS = 34
-            for n in range( 1,  ITERATIONS,1 ) :
-                ni.append(math.floor(ni[n - 1] / n))
-            print( "\n        ".join(["xi = (xi * _x) >> PRECISION;\n        res += xi * %s;" % hex(int(x)) for x in ni]))
+        and at the end, everything is divided by 34! :
+
+        1 + x + x^2/2! .. x^34 / 34!
+
+
 
     */
     function fixedExpUnsafe(uint256 _x) constant returns (uint256) {
     
-        uint256 xi = FIXED_ONE;
-        uint256 res = 0xde1bc4d19efcac82445da75b00000000 * xi;
+        uint256 res = 0xde1bc4d19efcac82445da75b00000000 * FIXED_ONE;
+        uint256 xi = _x;
 
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0xde1bc4d19efcb0000000000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x6f0de268cf7e58000000000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x2504a0cd9a7f72000000000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x9412833669fdc800000000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x1d9d4d714865f500000000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x4ef8ce836bba8c0000000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0xb481d807d1aa68000000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x16903b00fa354d000000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x281cdaac677b3400000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x402e2aad725eb80000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x5d5a6c9f31fe24000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x7c7890d442a83000000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x9931ed540345280000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0xaf147cf24ce150000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0xbac08546b867d000000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0xbac08546b867d00000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0xafc441338061b8000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x9c3cabbc0056e000000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x839168328705c80000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x694120286c04a0000;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x50319e98b3d2c400;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x3a52a1e36b82020;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x289286e0fce002;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x1b0c59eb53400;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x114f95b55400;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0xaa7210d200;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x650139600;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x39b78e80;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x1fd8080;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x10fbc0;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x8c40;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x462;
-        xi = (xi * _x) >> PRECISION;
-        res += xi * 0x22;
+        /**
+                
+        The values in this method been generated via the following python snippet: 
+
+        import math
+        ITERATIONS = 34
+
+        for a in range(2,ITERATIONS+1):
+            o = 1
+            for n in range(a,ITERATIONS+1):
+                o *= n
+            if a > 2:
+                print("        xi = (xi * _x) / FIXED_ONE; ")
+            print("        res += xi * 0x%x; // 34! / %d! " % (o, (a-1)))
+
+        **/
+
+        res += xi * 0xde1bc4d19efcac82445da75b00000000; // 34! / 1! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x6f0de268cf7e5641222ed3ad80000000; // 34! / 2! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x2504a0cd9a7f7215b60f9be480000000; // 34! / 3! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x9412833669fdc856d83e6f920000000; // 34! / 4! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x1d9d4d714865f4de2b3fafea0000000; // 34! / 5! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x4ef8ce836bba8cfb1dff2a70000000; // 34! / 6! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0xb481d807d1aa66d04490610000000; // 34! / 7! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x16903b00fa354cda08920c2000000; // 34! / 8! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x281cdaac677b334ab9e732000000; // 34! / 9! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x402e2aad725eb8778fd85000000; // 34! / 10! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x5d5a6c9f31fe2396a2af000000; // 34! / 11! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x7c7890d442a82f73839400000; // 34! / 12! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x9931ed54034526b58e400000; // 34! / 13! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0xaf147cf24ce150cf7e00000; // 34! / 14! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0xbac08546b867cdaa200000; // 34! / 15! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0xbac08546b867cdaa20000; // 34! / 16! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0xafc441338061b2820000; // 34! / 17! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x9c3cabbc0056d790000; // 34! / 18! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x839168328705c30000; // 34! / 19! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x694120286c049c000; // 34! / 20! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x50319e98b3d2c000; // 34! / 21! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x3a52a1e36b82000; // 34! / 22! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x289286e0fce000; // 34! / 23! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x1b0c59eb53400; // 34! / 24! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x114f95b55400; // 34! / 25! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0xaa7210d200; // 34! / 26! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x650139600; // 34! / 27! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x39b78e80; // 34! / 28! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x1fd8080; // 34! / 29! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x10fbc0; // 34! / 30! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x8c40; // 34! / 31! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x462; // 34! / 32! 
+        xi = (xi * _x) / FIXED_ONE; 
+        res += xi * 0x22; // 34! / 33!
 
         return res / 0xde1bc4d19efcac82445da75b00000000;
     }
